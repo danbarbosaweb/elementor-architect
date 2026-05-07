@@ -194,12 +194,11 @@ elementor-architect/
 ### Fase 1 — Fundação (atual)
 - [x] SKILL.md principal com metodologia completa
 - [x] CLAUDE.md e README.md
-- [ ] Documentação de suporte (`docs/`)
-- [ ] Templates de página (`templates/`)
+- [x] Documentação de suporte (`docs/`)
+- [x] Templates de página (`templates/`)
 
 ### Fase 2 — Aprofundamento
 - [ ] Guia de análise de referências com exemplos reais
-- [ ] Biblioteca de padrões de seção documentados
 - [ ] Casos de uso reais com screenshots
 - [ ] Guia de integração com Elementor Pro
 
@@ -210,7 +209,7 @@ elementor-architect/
 - [ ] Guia de otimização de performance
 
 ### Fase 4 — Comunidade
-- [ ] Repositório público no GitHub
+- [x] Repositório público no GitHub
 - [ ] Sistema de contribuição de templates
 - [ ] Exemplos de páginas construídas com a skill
 - [ ] Versão em inglês
