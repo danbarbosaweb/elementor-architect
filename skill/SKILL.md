@@ -165,14 +165,51 @@ Envie suas referências. Pode ser qualquer combinação de:
   • Nada — e deixar a skill propor a partir do objetivo
 ```
 
-### Passo 5 — Confirmação de Arquitetura
+### Passo 5 — CSS Personalizado
+
+```
+Você deseja CSS personalizado no projeto?
+
+  1. Sim — quero efeitos visuais avançados (glassmorphism, gradientes, animações CSS)
+  2. Não — CSS padrão do Elementor é suficiente
+```
+
+**Se Sim:** Ative o discovery de CSS antes da confirmação de arquitetura:
+- Quais elementos devem receber efeitos? (headlines, cards, botões, seções)
+- Qual estilo visual? (clean/minimalista, glassmorphism, gradientes vibrantes, dark, premium)
+- Tem referência visual de efeito? (print, link, descrição)
+
+**Se Não:** Registre `CSS_MODULE: desativado` e siga para o Passo 6.
+
+---
+
+### Passo 6 — Animações GSAP
+
+```
+Você deseja potencializar as animações do site com GSAP?
+
+  1. Sim — quero animações profissionais ao rolar a página
+  2. Não — animações nativas do Elementor são suficientes
+```
+
+**Se Sim:** Ative o discovery de animações antes da confirmação de arquitetura:
+- Qual o tom das animações? (sutil/elegante, impactante/dinâmico, lúdico/divertido)
+- Quais elementos devem animar? (hero, cards, títulos, botões, seções inteiras)
+- Tem referência de site com animação parecida com o que você quer?
+
+**Se Não:** Registre `GSAP_MODULE: desativado` e siga para a Confirmação de Arquitetura.
+
+---
+
+### Passo 7 — Confirmação de Arquitetura
 
 Após coletar as informações, **sempre** execute:
 
 1. **Resuma o entendimento** do projeto em 3–5 pontos objetivos
 2. **Proponha a arquitetura** de seções com justificativa estratégica para cada uma
 3. **Liste os widgets e ferramentas MCP** que serão utilizados
-4. **Aguarde aprovação explícita** antes de iniciar qualquer construção
+4. **Indique os módulos ativos** (CSS Expert e/ou GSAP Animator)
+5. **Aguarde aprovação explícita** antes de iniciar qualquer construção
 
 Exemplo de saída esperada nesta etapa:
 
@@ -197,6 +234,10 @@ ARQUITETURA PROPOSTA:
 WIDGETS: add-flexbox, add-heading, add-text-editor, add-button,
 add-counter, add-image, add-tabs, add-testimonial-carousel,
 add-accordion, add-form, add-custom-css
+
+MÓDULOS ATIVOS:
+✓ CSS Expert     — glassmorphism nos cards + texto gradiente na headline
+✓ GSAP Animator  — timeline do hero + stagger de cards + fade-in ao scroll
 
 Posso começar a construção?
 ```
@@ -1002,3 +1043,382 @@ Execute este checklist antes de declarar qualquer página concluída. Nenhum ite
 - [ ] Padding lateral mínimo de 16px nas seções no mobile
 - [ ] Layout de colunas adaptado (1 coluna no mobile para conteúdo de texto)
 - [ ] Imagens com configurações de tamanho específicas para mobile
+
+### Módulos Opcionais
+
+- [ ] CSS Expert: bloco `.ea-*` gerado e injetado via `update-page-settings` (se ativado)
+- [ ] CSS Expert: classes aplicadas nos widgets via campo CSS Classes do Elementor (se ativado)
+- [ ] GSAP: CDNs carregados apenas dos plugins realmente utilizados (se ativado)
+- [ ] GSAP: scripts consolidados em widget HTML único no final da página (se ativado)
+- [ ] GSAP: animações usando apenas `transform` e `opacity` (sem width/height/top/left) (se ativado)
+
+---
+
+## Módulo CSS Expert
+
+Ativado quando o usuário responde **Sim** no Passo 5 do Discovery.
+
+Gera CSS limpo injetado via CSS global da página usando `elementor-mcp-update-page-settings`. As classes seguem o prefixo `.ea-` (Elementor Architect) e são aplicadas nos widgets via campo **CSS Classes** do Elementor.
+
+### Fluxo de Execução CSS
+
+1. Gerar bloco CSS completo com todas as classes `.ea-*` necessárias para o projeto
+2. Injetar via: `elementor-mcp-update-page-settings` (campo CSS global da página)
+3. Instruir o usuário: adicionar a classe `.ea-[nome]` no campo **CSS Classes** do widget desejado
+
+### Convenção de Nomenclatura
+
+Prefixo `.ea-[categoria]-[efeito]`
+
+Exemplos: `.ea-text-gradient`, `.ea-card-glass`, `.ea-btn-glow`, `.ea-fade-in-up`
+
+### Catálogo de Efeitos CSS
+
+**Texto Gradiente Puro:**
+```css
+.ea-text-gradient {
+  background: linear-gradient(135deg, #7c3aed 0%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: inline-block;
+}
+```
+
+**Texto Misto (parte sólida + parte gradiente no mesmo heading):**
+
+Usar `<span class="ea-solid">` e `<span class="ea-gradient">` dentro do widget `text-editor`.
+
+```css
+.ea-text-mixed .ea-solid { color: #0f172a; }
+.ea-text-mixed .ea-gradient {
+  background: linear-gradient(135deg, #7c3aed 0%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: inline;
+}
+```
+
+**Shimmer Animado:**
+```css
+.ea-text-shimmer {
+  background: linear-gradient(90deg, #7c3aed 0%, #a855f7 40%, #ffffff 50%, #a855f7 60%, #7c3aed 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: ea-shimmer 3s linear infinite;
+  display: inline-block;
+}
+@keyframes ea-shimmer {
+  0%   { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+```
+
+**Glassmorphism (3 versões):**
+```css
+/* Padrão */
+.ea-card-glass {
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 16px;
+}
+/* Dark */
+.ea-card-glass-dark {
+  background: rgba(15,23,42,0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+}
+/* Light */
+.ea-card-glass-light {
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.9);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+}
+```
+
+**Borda com Gradiente (estática):**
+```css
+.ea-border-gradient {
+  position: relative;
+  border-radius: 12px;
+  background: #ffffff;
+}
+.ea-border-gradient::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #7c3aed, #3b82f6);
+  z-index: -1;
+}
+```
+
+**Borda com Gradiente Animada (rotação contínua):**
+```css
+.ea-border-gradient-animated {
+  position: relative;
+  border-radius: 12px;
+  background: #ffffff;
+  overflow: hidden;
+}
+.ea-border-gradient-animated::before {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  background: conic-gradient(transparent 270deg, #7c3aed, #3b82f6, transparent 360deg);
+  animation: ea-border-rotate 4s linear infinite;
+  z-index: -1;
+}
+.ea-border-gradient-animated::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 10px;
+  background: #ffffff;
+  z-index: -1;
+}
+@keyframes ea-border-rotate { 100% { transform: rotate(360deg); } }
+```
+
+**Botão Glow Pulsante:**
+```css
+.ea-btn-glow {
+  box-shadow: 0 0 20px rgba(124,58,237,0.4);
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+.ea-btn-glow:hover {
+  box-shadow: 0 0 40px rgba(124,58,237,0.7);
+  transform: translateY(-2px);
+}
+```
+
+**Animações de Entrada:**
+```css
+.ea-fade-in-up           { animation: ea-fadeInUp 0.7s ease both; }
+.ea-fade-in-up.ea-delay-1 { animation-delay: 0.1s; }
+.ea-fade-in-up.ea-delay-2 { animation-delay: 0.2s; }
+.ea-fade-in-up.ea-delay-3 { animation-delay: 0.3s; }
+@keyframes ea-fadeInUp {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ea-float { animation: ea-float 4s ease-in-out infinite; }
+@keyframes ea-float {
+  0%, 100% { transform: translateY(0px); }
+  50%      { transform: translateY(-12px); }
+}
+
+.ea-pulse-glow { animation: ea-pulseGlow 2.5s ease-in-out infinite; }
+@keyframes ea-pulseGlow {
+  0%, 100% { box-shadow: 0 0 16px rgba(124,58,237,0.3); }
+  50%      { box-shadow: 0 0 40px rgba(124,58,237,0.7); }
+}
+```
+
+### Regras do Módulo CSS
+
+- Gera todas as classes `.ea-*` em bloco único no CSS global da página
+- Adapta cores às variáveis de marca definidas no design system do projeto
+- Nunca usa `!important` sem justificativa explícita
+- Máximo 2 efeitos visuais por elemento
+- Código CSS comentado por bloco para facilitar manutenção
+
+---
+
+## Módulo GSAP Animator
+
+Ativado quando o usuário responde **Sim** no Passo 6 do Discovery.
+
+Animações são injetadas via widget HTML do Elementor (`add-widget` tipo `html`), sempre posicionado no final da seção ou página. Usa classes `.ea-*` como seletores — nunca IDs gerados automaticamente pelo Elementor.
+
+### CDNs por Plugin
+
+| Plugin | CDN | Observação |
+|--------|-----|-----------|
+| GSAP Core | `https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js` | Sempre incluir |
+| ScrollTrigger | `https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js` | Para animações ao scroll |
+| TextPlugin | `https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/TextPlugin.min.js` | Para efeito de digitação |
+| SplitText | — | **Requer GSAP Club (pago)** — avisar e oferecer alternativa gratuita |
+
+**Incluir apenas os CDNs dos plugins efetivamente usados na página.**
+
+### Easings de Referência
+
+| Easing | Uso Ideal |
+|--------|-----------|
+| `power2.out` | Padrão para 80% das animações |
+| `power3.out` | Entradas de headline |
+| `back.out(1.7)` | Botões e ícones |
+| `elastic.out(1, 0.3)` | Bounce suave |
+| `expo.out` | Transições elegantes |
+| `sine.inOut` | Loops e pulsações |
+
+### Catálogo de Animações GSAP
+
+**1. Fade In ao Entrar no Scroll**
+
+Classe no widget: `.ea-scroll-fade`
+
+```javascript
+gsap.utils.toArray(".ea-scroll-fade").forEach(el => {
+  gsap.from(el, {
+    opacity: 0, y: 48, duration: 0.8, ease: "power3.out",
+    scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none none" }
+  });
+});
+```
+
+**2. Stagger de Cards**
+
+Classe no container pai: `.ea-stagger-cards`
+
+```javascript
+gsap.from(".ea-stagger-cards .elementor-widget", {
+  opacity: 0, y: 60, duration: 0.7, ease: "power2.out", stagger: 0.12,
+  scrollTrigger: { trigger: ".ea-stagger-cards", start: "top 80%", toggleActions: "play none none none" }
+});
+```
+
+**3. Timeline do Hero (executa ao carregar)**
+
+Classes: `.ea-hero-overline`, `.ea-hero-headline`, `.ea-hero-subheadline`, `.ea-hero-cta`, `.ea-hero-trust`
+
+```javascript
+const heroTl = gsap.timeline({ defaults: { ease: "power3.out" } });
+heroTl
+  .from(".ea-hero-overline",     { opacity: 0, y: 20, duration: 0.5 })
+  .from(".ea-hero-headline",     { opacity: 0, y: 40, duration: 0.8 }, "-=0.2")
+  .from(".ea-hero-subheadline",  { opacity: 0, y: 30, duration: 0.7 }, "-=0.4")
+  .from(".ea-hero-cta",          { opacity: 0, y: 20, scale: 0.95, duration: 0.6 }, "-=0.3")
+  .from(".ea-hero-trust",        { opacity: 0, duration: 0.5 }, "-=0.2");
+```
+
+**4. Parallax por Scroll**
+
+```javascript
+// Lento (.ea-parallax-slow)
+gsap.to(".ea-parallax-slow", {
+  y: -80, ease: "none",
+  scrollTrigger: { trigger: ".ea-parallax-slow", start: "top bottom", end: "bottom top", scrub: 1.5 }
+});
+// Rápido (.ea-parallax-fast)
+gsap.to(".ea-parallax-fast", {
+  y: -160, ease: "none",
+  scrollTrigger: { trigger: ".ea-parallax-fast", start: "top bottom", end: "bottom top", scrub: 1 }
+});
+```
+
+**5. Contador Numérico Animado**
+
+Classe: `.ea-counter` com atributo `data-target="2847"`
+
+```javascript
+gsap.utils.toArray(".ea-counter").forEach(el => {
+  const target = parseInt(el.getAttribute("data-target"));
+  const obj = { val: 0 };
+  gsap.to(obj, {
+    val: target, duration: 2, ease: "power2.out",
+    onUpdate: () => { el.textContent = Math.round(obj.val).toLocaleString("pt-BR"); },
+    scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none none" }
+  });
+});
+```
+
+**6. Split por Caractere (gratuito — sem SplitText)**
+
+Classe: `.ea-split-chars`
+
+```javascript
+document.querySelectorAll(".ea-split-chars").forEach(el => {
+  const chars = el.textContent.split("").map(c => {
+    const span = document.createElement("span");
+    span.textContent = c === " " ? " " : c;
+    span.style.display = "inline-block";
+    return span;
+  });
+  el.textContent = "";
+  chars.forEach(s => el.appendChild(s));
+  gsap.from(chars, {
+    opacity: 0, y: 40, rotateX: -90, duration: 0.5,
+    ease: "power3.out", stagger: 0.025,
+    scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none none" }
+  });
+});
+```
+
+**7. Split por Palavra**
+
+Classe: `.ea-split-words`
+
+```javascript
+document.querySelectorAll(".ea-split-words").forEach(el => {
+  const words = el.textContent.split(" ").map(w => {
+    const span = document.createElement("span");
+    span.textContent = w + " ";
+    span.style.display = "inline-block";
+    return span;
+  });
+  el.textContent = "";
+  words.forEach(s => el.appendChild(s));
+  gsap.from(words, {
+    opacity: 0, y: 24, duration: 0.6,
+    ease: "power2.out", stagger: 0.06,
+    scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none none" }
+  });
+});
+```
+
+**8. Botão Magnético**
+
+Classe: `.ea-magnetic`
+
+```javascript
+document.querySelectorAll(".ea-magnetic").forEach(el => {
+  el.addEventListener("mousemove", e => {
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    gsap.to(el, { x: x * 0.3, y: y * 0.3, duration: 0.3, ease: "power2.out" });
+  });
+  el.addEventListener("mouseleave", () => {
+    gsap.to(el, { x: 0, y: 0, duration: 0.6, ease: "elastic.out(1, 0.4)" });
+  });
+});
+```
+
+**9. Pin de Seção com Storytelling**
+
+Classes: `.ea-pin-section` (container), `.ea-pin-step` (cada step)
+
+```javascript
+const steps = gsap.utils.toArray(".ea-pin-step");
+const pinTl = gsap.timeline({
+  scrollTrigger: {
+    trigger: ".ea-pin-section",
+    pin: true, scrub: 0.5,
+    start: "top top",
+    end: `+=${steps.length * 600}`
+  }
+});
+steps.forEach((step, i) => {
+  if (i > 0) pinTl.from(step, { opacity: 0, y: 60, duration: 1 }, i);
+  if (i < steps.length - 1) pinTl.to(step, { opacity: 0, y: -60, duration: 1 }, i + 0.5);
+});
+```
+
+### Regras do Módulo GSAP
+
+- Incluir apenas CDNs dos plugins realmente usados na página
+- Posicionar o widget HTML **sempre no final** da seção ou página
+- Consolidar **todos** os scripts em um único widget HTML
+- Usar apenas `transform` e `opacity` — nunca animar `width`, `height`, `top`, `left`
+- Sempre usar `ScrollTrigger` em elementos below-the-fold
+- Avisar o usuário sobre plugins pagos (SplitText) e oferecer alternativa gratuita imediatamente
